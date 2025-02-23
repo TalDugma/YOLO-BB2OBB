@@ -4,7 +4,7 @@ Convert a **YOLO Object Detection Dataset** with standard **Bounding Box (BB)** 
 
 ## Installation
 
-1. Follow [Meta's official guide](add-link-here) to set up SAM2 as a package.
+1. Follow [Meta's official guide](https://github.com/facebookresearch/sam2) to set up SAM2 as a package.
 2. `cd` to the repo directory:
    ```bash
    cd YOLO-BB2OBB
@@ -25,7 +25,7 @@ python obb.py --dataset_path <path-to-bb-dataset> --output_path <path-to-output-
 ### Example
 
 ```bash
-python obb.py --dataset_path ./datasets/yolo_bb --output_path ./datasets/yolo_obb
+python obb.py ./datasets/yolo_bb ./datasets/yolo_obb
 ```
 
 ## Description
