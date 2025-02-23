@@ -2,7 +2,7 @@
 
 Convert a **YOLO Object Detection Dataset** with standard **Bounding Box (BB)** annotations to a **YOLO Oriented Bounding Box (OBB)** dataset automatically using **Meta's Segment Anything Model 2 (SAM2)**.
 
-![That's why you should use my code](images/image.png)
+![That's why you should use my code](images/obb.png)
 
 ## Installation
 
