@@ -38,3 +38,8 @@ This script utilizes **Meta's SAM2** to refine standard bounding boxes into orie
 - Meta's SAM2
 - Dependencies from `requirements.txt`
 
+## Acknowledgments
+
+Shout out to **YOLO by Ultralytics** for their incredible work in advancing object detection models.
+
+
