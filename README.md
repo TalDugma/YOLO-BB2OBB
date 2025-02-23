@@ -4,7 +4,7 @@ Convert a **YOLO Object Detection Dataset** with standard **Bounding Box (BB)** 
 
 ## Installation
 
-1. Follow [Meta's official guide](https://github.com/facebookresearch/sam2) to set up SAM2 as a package.
+1. Follow [Meta's official guide](https://github.com/facebookresearch/sam2) to set up SAM2 as a package and install checkpoints.
 2. `cd` to the repo directory:
    ```bash
    cd YOLO-BB2OBB
