@@ -15,13 +15,13 @@ Convert a **YOLO Object Detection Dataset** with standard **Bounding Box (BB)** 
 To convert your dataset, run the following command:
 
 ```bash
-python obb.py --BB_dataset_path <path-to-bb-dataset> --Desired_output_OBB_path <path-to-output-obb-dataset>
+python obb.py --dataset_path <path-to-bb-dataset> --output_path <path-to-output-obb-dataset>
 ```
 
 ### Example
 
 ```bash
-python obb.py --BB_dataset_path ./datasets/yolo_bb --Desired_output_OBB_path ./datasets/yolo_obb
+python obb.py --dataset_path ./datasets/yolo_bb --output_path ./datasets/yolo_obb
 ```
 
 ## Description
@@ -34,6 +34,3 @@ This script utilizes **Meta's SAM2** to refine standard bounding boxes into orie
 - Meta's SAM2
 - Dependencies from `requirements.txt`
 
-## License
-
-This project is licensed under [Your Preferred License].
