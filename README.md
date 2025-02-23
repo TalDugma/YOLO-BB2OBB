@@ -7,7 +7,8 @@ Convert a **YOLO Object Detection Dataset** with standard **Bounding Box (BB)** 
 1. Follow [Meta's official guide](add-link-here) to set up SAM2 as a package.
 2. `cd` to the repo directory:
    ```bash
-   cd /path/to/your/repo
+   cd YOLO-BB2OBB
+
 3. Install the required dependencies from the `requirements.txt` file:
    ```bash
    pip install -r requirements.txt
