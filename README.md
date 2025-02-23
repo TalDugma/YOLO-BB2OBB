@@ -42,6 +42,6 @@ This script utilizes **Meta's SAM2** to refine standard bounding boxes into orie
 
 ## Acknowledgments
 
-Shout out to **YOLO by Ultralytics** for their incredible work advancing object detection models and to mindkosh for the image above.
+Shout out to **YOLO by Ultralytics** for their incredible work advancing object detection models and to mindkosh for the image above. Shout out to my mom and Ronaldo also.
 
 
