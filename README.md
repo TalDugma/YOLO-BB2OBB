@@ -30,7 +30,7 @@ python obb.py <dataset_path> <output_path> [OPTIONS]
 | `output_path`      | `str`  | Required                                                       | Path to save the generated OBB dataset. |
 | `--model_cfg`      | `str`  | `"configs/sam2.1/sam2.1_hiera_l.yaml"`                         | Path to the SAM2 model configuration file. |
 | `--checkpoint_path`| `str`  | `"~/sam2/checkpoints/sam2.1_hiera_large.pt"`                   | Path to the SAM2 model checkpoint. |
-| `--device`         | `str`  | `"cuda:1"`                                                     | Device to run the model on (e.g., `cuda:0`, `cuda:1`, or `cpu`). |
+| `--device`         | `str`  | `"cpu"`                                                     | Device to run the model on (e.g., `cuda:0`, `cuda:1`, or `cpu`). |
 | `--use_max_contour`| `bool` | `False`                                                        | Whether to use only the max contour to generate OBBs. If `False`, the whole mask is used. |
 
 ### Example
