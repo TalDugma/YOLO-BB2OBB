@@ -12,6 +12,9 @@ from collections import defaultdict
 import ast
 import shutil
 import argparse
+from tqdm import tqdm
+from pathlib import Path
+
 
 # define new class "annotations"
 class Annotations():
@@ -38,11 +41,11 @@ class Annotations():
 
 
 # Check device availability and configure PyTorch
-def configure_device():
+def configure_device(dev):
     if torch.cuda.is_available():
-        device = torch.device("cuda:0")
-        torch.autocast("cuda", dtype=torch.bfloat16).__enter__()
-        if torch.cuda.get_device_properties(0).major >= 8:
+        device = torch.device(dev)
+        torch.autocast(dev, dtype=torch.bfloat16).__enter__()
+        if torch.cuda.get_device_properties(device).major >= 8:
             torch.backends.cuda.matmul.allow_tf32 = True
             torch.backends.cudnn.allow_tf32 = True
         return device
@@ -71,7 +74,7 @@ def generate_mask(bbox, frame, predictor):
     return mask
 
 def generate_masks(annotations, predictor):
-    for annotation in annotations:
+    for annotation in tqdm(annotations, desc="Generating masks"):
         for bbox in annotation.bounding_boxes:
             cls = bbox[0]
             mask = generate_mask(bbox, annotation.image, predictor)
@@ -87,7 +90,7 @@ def get_annotations(dataset_path, set="train"):
     if not os.path.exists(images_path) or not os.path.exists(labels_path):
         return None
     annotations = []
-    for image_file in os.listdir(images_path):
+    for image_file in tqdm(os.listdir(images_path), desc="Loading annotations"):
         image_path = os.path.join(images_path, image_file)
         image = cv2.imread(image_path)
         label_file = os.path.join(labels_path, image_file.replace(".jpg", ".txt"))
@@ -103,16 +106,27 @@ def get_annotations(dataset_path, set="train"):
     return annotations
 
         
-def get_obb(annotations):
-    for annotation in annotations:
+def get_obb(annotations, use_max_contour=False):
+    for annotation in tqdm(annotations, desc="Generating OBBs"):
         for mask in annotation.masks:
             cls, mask = mask
-            # Find contours
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            # Get the biggest contour
-            contour = max(contours, key=cv2.contourArea)
-            # Get the rotated rectangle from the contour
-            rect = cv2.minAreaRect(contour)
+            # Find contours
+            if len(contours) == 0:
+                print(f"No contours found for {annotation.image_file}")
+                continue
+
+            if use_max_contour:
+                # Get the biggest contour
+                contour = max(contours, key=cv2.contourArea)
+                # Get the minimum area bounding box
+                rect = cv2.minAreaRect(contour)
+            else:
+                # Combine all contour points into a single array
+                all_points = np.vstack(contours)
+                # Compute the minimum area bounding rectangle for all points
+                rect = cv2.minAreaRect(all_points)
+
             # Get the four corners of the rectangle
             box = cv2.boxPoints(rect)
             # normalize the box
@@ -130,7 +144,7 @@ def create_yolo_obb_dataset(annotations, output_path, set="train"):
     labels_path = os.path.join(output_path, set, "labels")
     os.makedirs(images_path, exist_ok=True)
     os.makedirs(labels_path, exist_ok=True)
-    for annotation in annotations:
+    for annotation in tqdm(annotations, desc="Saving YOLO OBB dataset"):
         file_name = os.path.basename(annotation.image_file)
         image_path = os.path.join(images_path, file_name)
         cv2.imwrite(image_path, annotation.image)
@@ -142,22 +156,26 @@ def create_yolo_obb_dataset(annotations, output_path, set="train"):
 
                 
 
-def main(dataset_path, output_path):
-    device = configure_device()
+def main(args):
+    dataset_path = args.dataset_path
+    output_path = args.output_path
+    device = args.device
+    use_max_contour = args.use_max_contour
+    device = configure_device(device)
     if os.path.exists(output_path):
         # remove the output path
         shutil.rmtree(output_path)
-    for set in ["train", "val", "test"]:
+    for set in ["train", "valid", "test"]:
         annotations = get_annotations(dataset_path, set)
         if annotations is None:
             print(f"No annotations found for {set} set")
             continue
         print(f"Generating OBB labels for {set} set")
-        predictor = initialize_predictor("configs/sam2.1/sam2.1_hiera_l.yaml", "/data/home/tal.dugma/sam2/checkpoints/sam2.1_hiera_large.pt", device)
+        predictor = initialize_predictor(args.model_cfg, args.checkpoint_path, device)
         print("Predictor initialized")
         annotations = generate_masks(annotations, predictor) 
         print("Masks generated")
-        annotations = get_obb(annotations)
+        annotations = get_obb(annotations, use_max_contour)
         print("OBB labels generated")
         create_yolo_obb_dataset(annotations, output_path, set)
         print(f"OBB labels created for {set} set")
@@ -168,5 +186,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate OBB labels from BB labels using SAM2.")
     parser.add_argument("dataset_path", type=str, help="Path to the dataset containing train/val/test sets.")
     parser.add_argument("output_path", type=str, help="Path to save the generated OBB dataset.")
+    parser.add_argument("--model_cfg", type=str, default="configs/sam2.1/sam2.1_hiera_l.yaml", help="Path to the SAM2 model configuration file.")
+    path = Path.home() / "sam2" / "checkpoints" / "sam2.1_hiera_large.pt"
+    parser.add_argument("--checkpoint_path", type=str, default=path, help="Path to the SAM2 model checkpoint.")
+    parser.add_argument("--device", type=str, default="cpu", help="Device to run the model on.")
+    parser.add_argument("--use_max_contour", type=bool, default=False, help="Whether to use the max contour to generate OBBs. If not, uses the whole mask.")
     args = parser.parse_args()
-    main(args.dataset_path, args.output_path)
+    main(args)
