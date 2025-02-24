@@ -16,20 +16,38 @@ Convert a **YOLO Object Detection Dataset** with standard **Bounding Box (BB)** 
    pip install -r requirements.txt
    ```
 
-## Usage
-
-To convert your dataset, run the following command:
+### Usage
 
 ```bash
-python obb.py --dataset_path <path-to-bb-dataset> --output_path <path-to-output-obb-dataset>
+python generate_obb_labels.py <dataset_path> <output_path> [OPTIONS]
 ```
+
+### Arguments
+
+| Argument            | Type   | Default Value                                                   | Description |
+|--------------------|--------|-----------------------------------------------------------------|-------------|
+| `dataset_path`     | `str`  | Required                                                       | Path to the dataset containing `train/val/test` sets. |
+| `output_path`      | `str`  | Required                                                       | Path to save the generated OBB dataset. |
+| `--model_cfg`      | `str`  | `"configs/sam2.1/sam2.1_hiera_l.yaml"`                         | Path to the SAM2 model configuration file. |
+| `--checkpoint_path`| `str`  | `"~/sam2/checkpoints/sam2.1_hiera_large.pt"`                   | Path to the SAM2 model checkpoint. |
+| `--device`         | `str`  | `"cuda:1"`                                                     | Device to run the model on (e.g., `cuda:0`, `cuda:1`, or `cpu`). |
+| `--use_max_contour`| `bool` | `False`                                                        | Whether to use only the max contour to generate OBBs. If `False`, the whole mask is used. |
 
 ### Example
 
 ```bash
-python obb.py ./datasets/yolo_bb ./datasets/yolo_obb
+python generate_obb_labels.py /path/to/dataset /path/to/output \
+    --model_cfg configs/sam2.1/sam2.1_hiera_l.yaml \
+    --checkpoint_path ~/sam2/checkpoints/sam2.1_hiera_large.pt \
+    --device cuda:0 \
+    --use_max_contour True
 ```
 
+### Notes
+
+- Ensure that the SAM2 model configuration and checkpoint files are correctly specified.
+- If running on a GPU, set the `--device` argument accordingly (e.g., `cuda:0`).
+- If `--use_max_contour` is set to `True`, only the largest contour in the mask will be used for OBB generation.
 ## Description
 
 This script utilizes **Meta's SAM2** to refine standard bounding boxes into oriented bounding boxes, improving object detection accuracy in YOLO models that support OBB annotations.
