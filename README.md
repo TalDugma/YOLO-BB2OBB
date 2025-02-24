@@ -19,7 +19,7 @@ Convert a **YOLO Object Detection Dataset** with standard **Bounding Box (BB)** 
 ### Usage
 
 ```bash
-python generate_obb_labels.py <dataset_path> <output_path> [OPTIONS]
+python obb.py <dataset_path> <output_path> [OPTIONS]
 ```
 
 ### Arguments
@@ -36,7 +36,7 @@ python generate_obb_labels.py <dataset_path> <output_path> [OPTIONS]
 ### Example
 
 ```bash
-python generate_obb_labels.py /path/to/dataset /path/to/output \
+python obb.py /path/to/dataset /path/to/output \
     --model_cfg configs/sam2.1/sam2.1_hiera_l.yaml \
     --checkpoint_path ~/sam2/checkpoints/sam2.1_hiera_large.pt \
     --device cuda:0 \
